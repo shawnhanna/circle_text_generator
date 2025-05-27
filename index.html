@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tengwar Font Display</title>
+    <style>
+        @font-face {
+            font-display: block;
+            font-family: TengwarTelcontar;
+            font-style: normal;
+            font-weight: 400;
+            src: url('./fonts/tengtelcOTL.woff2') format("woff2")
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        .font-selector {
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: TengwarTelcontar, serif;
+            font-size: 24px;
+            direction: ltr;
+        }
+
+        .output-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+
+        .tengwar {
+            font-family: TengwarTelcontar, serif;
+            font-size: 28px;
+            line-height: 1.5;
+            direction: ltr;
+            text-align: left;
+        }
+        
+        .circle-container {
+            position: relative;
+            width: 1000px;
+            height: 1000px;
+            margin: 0 auto;
+        }
+        
+        .svg-container {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+        
+        .path-text {
+            font-family: TengwarTelcontar, serif;
+            font-size: 24px;
+            fill: #000;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .sample-text {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+        
+        .display-options {
+            margin: 15px 0;
+        }
+        
+        .display-option {
+            margin-right: 15px;
+        }
+        
+        .radius-control, .angle-control, .font-size-control {
+            margin-top: 15px;
+            display: block;
+        }
+        
+        #circular-output {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+        
+        .radius-slider, .angle-slider, .font-size-slider {
+            width: 250px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tengwar Font Display</h1>
+    
+    <div class="input-container">
+        <label for="input-text">Enter Text to Display in Tengwar Font:</label>
+        <div class="font-selector">
+            <label for="input-font">Input Font:</label>
+            <select id="input-font" class="font-dropdown">
+                <option value="TengwarTelcontar">Tengwar Telcontar</option>
+                <option value="Arial">Arial (Normal Text)</option>
+                <option value="Times New Roman">Times New Roman</option>
+            </select>
+        </div>
+        <textarea id="input-text" placeholder="Type your text here..."></textarea>
+        <div class="font-selector">
+            <label for="output-font">Output Font:</label>
+            <select id="output-font" class="font-dropdown">
+                <option value="TengwarTelcontar">Tengwar Telcontar</option>
+                <option value="Arial">Arial (Normal Text)</option>
+                <option value="Times New Roman">Times New Roman</option>
+            </select>
+        </div>
+        <div class="display-options">
+            <label class="display-option">
+                <input type="radio" name="display-type" value="normal"> Normal
+            </label>
+            <label class="display-option">
+                <input type="radio" name="display-type" value="circular" checked> Circular
+            </label>
+        </div>
+        <div id="radius-control" class="radius-control">
+            <label for="radius-slider">Circle Radius: <span id="radius-value">300</span>px</label>
+            <input type="range" id="radius-slider" class="radius-slider" min="50" max="500" value="300">
+        </div>
+        <div id="angle-control" class="angle-control">
+            <label for="angle-slider">Start Angle: <span id="angle-value">0</span>°</label>
+            <input type="range" id="angle-slider" class="angle-slider" min="0" max="360" value="0">
+        </div>
+        <div id="font-size-control" class="font-size-control">
+            <label for="font-size-slider">Font Size: <span id="font-size-value">24</span>px</label>
+            <input type="range" id="font-size-slider" class="font-size-slider" min="12" max="48" value="24">
+        </div>
+        <button id="display-btn">Display</button>
+        <button id="sample-btn">Load Sample 1</button>
+        <button id="sample-btn2">Load Sample 2</button>
+    </div>
+
+    <div class="output-container">
+        <div id="tengwar-output" class="tengwar" style="display:none;"></div>
+        <div id="circular-output" class="circle-container">
+            <svg class="svg-container" viewBox="0 0 1000 1000">
+                <path id="text-path" d="M 500,500 m -300,0 a 300,300 0 1,1 600,0 a 300,300 0 1,1 -600,0" fill="none" stroke="transparent" />
+                <text id="path-text" class="path-text">
+                    <textPath href="#text-path" startOffset="0%"></textPath>
+                </text>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="sample-text">
+        <h3>About the Telcontar Font</h3>
+        <p>The Telcontar font is designed for writing in Tengwar, the writing system created by J.R.R. Tolkien for his fictional world of Middle-earth.</p>
+        <p>The text above is displayed directly in the Telcontar font. To use it properly, you need text that is already encoded for this font.</p>
+    </div>
+
+    <script>
+        document.getElementById('display-btn').addEventListener('click', displayText);
+        document.getElementById('input-text').addEventListener('input', displayText);
+        document.getElementById('sample-btn').addEventListener('click', loadSampleText);
+        document.getElementById('sample-btn2').addEventListener('click', loadSampleText2);
+        
+        // Add event listeners for display type radio buttons
+        document.querySelectorAll('input[name="display-type"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                displayText();
+            });
+        });
+        
+        // Add event listener for radius slider
+        document.getElementById('radius-slider').addEventListener('input', function() {
+            document.getElementById('radius-value').textContent = this.value;
+            displayText();
+        });
+
+        // Add event listener for angle slider
+        document.getElementById('angle-slider').addEventListener('input', function() {
+            document.getElementById('angle-value').textContent = this.value;
+            displayText();
+        });
+        
+        // Add event listener for font size slider
+        document.getElementById('font-size-slider').addEventListener('input', function() {
+            document.getElementById('font-size-value').textContent = this.value;
+            displayText();
+        });
+
+        // Add event listeners for font dropdowns
+        document.getElementById('input-font').addEventListener('change', function() {
+            const fontFamily = this.value;
+            document.getElementById('input-text').style.fontFamily = fontFamily === 'TengwarTelcontar' ? 
+                'TengwarTelcontar, serif' : fontFamily;
+        });
+
+        document.getElementById('output-font').addEventListener('change', function() {
+            displayText();
+        });
+
+        function displayText() {
+            const inputText = document.getElementById('input-text').value;
+            const displayType = document.querySelector('input[name="display-type"]:checked').value;
+            const outputFont = document.getElementById('output-font').value;
+            const fontFamily = outputFont === 'TengwarTelcontar' ? 'TengwarTelcontar, serif' : outputFont;
+            
+            if (displayType === 'normal') {
+                const tengwarOutput = document.getElementById('tengwar-output');
+                tengwarOutput.textContent = inputText;
+                tengwarOutput.style.fontFamily = fontFamily;
+                tengwarOutput.style.display = 'block';
+                document.getElementById('circular-output').style.display = 'none';
+            } else {
+                // Get font size and radius 
+                const fontSize = document.getElementById('font-size-slider').value;
+                const radius = document.getElementById('radius-slider').value;
+                const startAngle = parseInt(document.getElementById('angle-slider').value);
+                
+                // Update the SVG path for the radius
+                const textPath = document.getElementById('text-path');
+                textPath.setAttribute('d', `M 500,500 m -${radius},0 a ${radius},${radius} 0 1,1 ${radius*2},0 a ${radius},${radius} 0 1,1 -${radius*2},0`);
+                
+                // Set the text content
+                const textPathElement = document.querySelector('#path-text textPath');
+                textPathElement.textContent = inputText;
+                
+                // Apply the selected font family to the path text
+                const pathText = document.getElementById('path-text');
+                pathText.style.fontFamily = fontFamily;
+                
+                // Apply rotation for start angle
+                const svgElement = document.querySelector('.svg-container');
+                svgElement.style.transform = `rotate(${startAngle}deg)`;
+                svgElement.style.transformOrigin = 'center';
+                
+                // Reset the startOffset to 0%
+                textPathElement.setAttribute('startOffset', '0%');
+                
+                // Update the font size
+                pathText.style.fontSize = `${fontSize}px`;
+                
+                // Center the SVG container properly
+                const circleContainer = document.getElementById('circular-output');
+                circleContainer.style.width = `${radius * 2 + 100}px`;
+                circleContainer.style.height = `${radius * 2 + 100}px`;
+                
+                document.getElementById('tengwar-output').style.display = 'none';
+                document.getElementById('circular-output').style.display = 'block';
+            }
+        }
+        
+        function loadSampleText() {
+            // This is the sample text from the URL in tengwar encoding for Telcontar font
+            const sampleText = "              ";
+            document.getElementById('input-text').value = sampleText;
+            displayText();
+        }
+
+        function loadSampleText2() {
+            // This is another sample text in tengwar encoding for Telcontar font
+            const sampleText2 = "             ";
+            document.getElementById('input-text').value = sampleText2;
+            displayText();
+        }
+
+        // Initialize with sample text
+        loadSampleText()
+    </script>
+</body>
+</html>
