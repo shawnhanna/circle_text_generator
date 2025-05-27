@@ -12,6 +12,46 @@
             font-weight: 400;
             src: url('./fonts/tengtelcOTL.woff2') format("woff2")
         }
+        
+        @font-face {
+            font-display: block;
+            font-family: TengwarParmaite;
+            font-style: normal;
+            font-weight: 400;
+            src: url('./fonts/tengwar-parmaite-glaemscrafu.woff2') format("woff2")
+        }
+        
+        @font-face {
+            font-display: block;
+            font-family: TengwarAnnatar;
+            font-style: normal;
+            font-weight: 400;
+            src: url('./fonts/tengwar-annatar-glaemscrafu.woff2') format("woff2")
+        }
+        
+        @font-face {
+            font-display: block;
+            font-family: TengwarAlcarin;
+            font-style: normal;
+            font-weight: 400;
+            src: url('./fonts/AlcarinTengwar-Regular.woff2') format("woff2")
+        }
+        
+        @font-face {
+            font-display: block;
+            font-family: TengwarEldamar;
+            font-style: normal;
+            font-weight: 400;
+            src: url('./fonts/tengwar-eldamar-glaemscrafu.woff2') format("woff2")
+        }
+        
+        @font-face {
+            font-display: block;
+            font-family: TengwarArtano;
+            font-style: normal;
+            font-weight: 400;
+            src: url('./fonts/TengwarArtano.woff2') format("woff2")
+        }
 
         body {
             font-family: Arial, sans-serif;
@@ -135,19 +175,16 @@
     
     <div class="input-container">
         <label for="input-text">Enter Text to Display in Tengwar Font:</label>
-        <div class="font-selector">
-            <label for="input-font">Input Font:</label>
-            <select id="input-font" class="font-dropdown">
-                <option value="TengwarTelcontar">Tengwar Telcontar</option>
-                <option value="Arial">Arial (Normal Text)</option>
-                <option value="Times New Roman">Times New Roman</option>
-            </select>
-        </div>
         <textarea id="input-text" placeholder="Type your text here..."></textarea>
         <div class="font-selector">
-            <label for="output-font">Output Font:</label>
+            <label for="output-font">Font:</label>
             <select id="output-font" class="font-dropdown">
-                <option value="TengwarTelcontar">Tengwar Telcontar</option>
+                <option value="TengwarTelcontar">Telcontar</option>
+                <option value="TengwarParmaite">Parmaite</option>
+                <option value="TengwarEldamar">Eldamar</option>
+                <option value="TengwarArtano">Artano</option>
+                <option value="TengwarAnnatar">Annatar</option>
+                <option value="TengwarAlcarin">Alcarin Tengwar</option>
                 <option value="Arial">Arial (Normal Text)</option>
                 <option value="Times New Roman">Times New Roman</option>
             </select>
@@ -226,22 +263,42 @@
             displayText();
         });
 
-        // Add event listeners for font dropdowns
-        document.getElementById('input-font').addEventListener('change', function() {
+        // Remove the input font event listener and modify the output font event listener
+        document.getElementById('output-font').addEventListener('change', function() {
             const fontFamily = this.value;
-            document.getElementById('input-text').style.fontFamily = fontFamily === 'TengwarTelcontar' ? 
-                'TengwarTelcontar, serif' : fontFamily;
+            
+            // Apply the font to both input and output
+            if (fontFamily.startsWith('Tengwar')) {
+                document.getElementById('input-text').style.fontFamily = `${fontFamily}, serif`;
+            } else {
+                document.getElementById('input-text').style.fontFamily = fontFamily;
+            }
+            
+            displayText();
         });
 
-        document.getElementById('output-font').addEventListener('change', function() {
-            displayText();
+        // Add paste event listener for the textarea
+        document.getElementById('input-text').addEventListener('paste', function() {
+            // Use setTimeout to ensure the paste operation completes first
+            setTimeout(() => {
+                const fontFamily = document.getElementById('output-font').value;
+                if (fontFamily.startsWith('Tengwar')) {
+                    this.style.fontFamily = `${fontFamily}, serif`;
+                } else {
+                    this.style.fontFamily = fontFamily;
+                }
+                displayText();
+            }, 10);
         });
 
         function displayText() {
             const inputText = document.getElementById('input-text').value;
             const displayType = document.querySelector('input[name="display-type"]:checked').value;
             const outputFont = document.getElementById('output-font').value;
-            const fontFamily = outputFont === 'TengwarTelcontar' ? 'TengwarTelcontar, serif' : outputFont;
+            
+            // Apply font family with serif fallback for all Tengwar fonts
+            const fontFamily = outputFont.startsWith('Tengwar') ? 
+                `${outputFont}, serif` : outputFont;
             
             if (displayType === 'normal') {
                 const tengwarOutput = document.getElementById('tengwar-output');
